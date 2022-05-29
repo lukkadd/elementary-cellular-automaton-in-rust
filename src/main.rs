@@ -4,21 +4,21 @@ use std::io::Write;
 fn main() {
 
     //Defining ECA configuration
-    const NUMBER_OF_CELLS: usize = 64;
-	const ITERATIONS: usize = 20;
+    const NUMBER_OF_CELLS: usize = 2048;
+	const ITERATIONS: usize = 1024;
 	
 	 //Defining ECA initial state (first row)
 	let mut initial_state: Vec<bool> = vec![false; NUMBER_OF_CELLS];
 	initial_state[(NUMBER_OF_CELLS / 2)] = true;
 
     //Generating ECA data over multiple generations
-	let automaton_data = eca(&initial_state, rule30, ITERATIONS);
+	let automaton_data = eca(&initial_state, rule60, ITERATIONS);
     
     //Boolean to color conversion
 	let color_data = bool_to_color(&automaton_data);
 
     //Writing data to image
-	create_ppm("./examples/rule-30.ppm", NUMBER_OF_CELLS, ITERATIONS, &color_data);
+	create_ppm("./examples/rule-60.ppm", NUMBER_OF_CELLS, ITERATIONS, &color_data);
 }
 
 // Create PPM image file
@@ -48,6 +48,11 @@ fn bool_to_color (bool_data: &Vec<bool>) -> Vec<i32> {
 // ECA rule 30 defined in a boolean function
 fn rule30 (p: bool, q:bool, r: bool) -> bool{
 	(!p && r) || (!p && q) || (p && !q && !r)
+}
+
+// ECA rule 60
+fn rule60 (p: bool, q:bool, _r: bool) -> bool{
+	(p && !q) || (!p && q)
 }
 
 // Generate ECA data based on a given initial state, rule and number of iterations
