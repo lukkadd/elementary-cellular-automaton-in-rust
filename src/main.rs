@@ -2,29 +2,23 @@ use std::fs::File;
 use std::io::Write;
 
 fn main() {
-    //image creation test
-    create_ppm("./examples/image-test.ppm", 3, 1, &vec!(0xFF00FF, 0x00FFFF, 0xFFFF00));
-    
-    //rule 30 test
-    println!("{}",rule30(true, false, true));
-
-    //cellular automaton test (data only)
 
     //Defining ECA configuration
     const NUMBER_OF_CELLS: usize = 64;
 	const ITERATIONS: usize = 20;
 	
-    //Defining ECA initial state (first row)
+	 //Defining ECA initial state (first row)
 	let mut initial_state: Vec<bool> = vec![false; NUMBER_OF_CELLS];
 	initial_state[(NUMBER_OF_CELLS / 2)] = true;
 
-    //Generating ECA data over multiple generations 
-    let eca_data = eca(&initial_state, rule30, ITERATIONS);
-    println!("{:?}", eca_data);
+    //Generating ECA data over multiple generations
+	let automaton_data = eca(&initial_state, rule30, ITERATIONS);
+    
+    //Boolean to color conversion
+	let color_data = bool_to_color(&automaton_data);
 
-    //boolean to color conversion test
-    let color_data = bool_to_color(&eca_data);
-    println!("{:?}", color_data);
+    //Writing data to image
+	create_ppm("./examples/rule-30.ppm", NUMBER_OF_CELLS, ITERATIONS, &color_data);
 }
 
 // Create PPM image file
