@@ -7,6 +7,20 @@ fn main() {
     
     //rule 30 test
     println!("{}",rule30(true, false, true));
+
+    //cellular automaton test (data only)
+
+    //Defining ECA configuration
+    const NUMBER_OF_CELLS: usize = 64;
+	const ITERATIONS: usize = 20;
+	
+    //Defining ECA initial state (first row)
+	let mut initial_state: Vec<bool> = vec![false; NUMBER_OF_CELLS];
+	initial_state[(NUMBER_OF_CELLS / 2)] = true;
+
+    //Generating ECA data over multiple generations 
+    let eca_data = eca(&initial_state, rule30, ITERATIONS);
+    println!("{:?}", eca_data);
 }
 
 /** Create PPM image file */
@@ -26,4 +40,38 @@ fn create_ppm(path: &str, width: usize, height: usize, pixel_data: &[i32]) {
 
 fn rule30 (p: bool, q:bool, r: bool) -> bool{
 	(!p && r) || (!p && q) || (p && !q && !r)
+}
+
+fn eca (initial_state: &Vec<bool>, rule: fn(bool, bool, bool) -> bool, iterations: usize) -> Vec<bool> {
+	let mut result: Vec<bool> = Vec::new();
+	let number_of_cells = initial_state.len();
+
+	result.append(&mut initial_state.clone());
+
+	for i in 0..iterations+1 {
+		result.append(&mut eca_step(&result[(i*number_of_cells)..((i+1)*number_of_cells)], rule));
+	}
+
+	return result;
+}
+
+fn eca_step (current_state: &[bool], rule: fn(bool, bool, bool)->bool) -> Vec<bool> {
+	if current_state.len() < 3 {panic!("length {}", current_state.len())} //Must have at least 3 cells for the rule to apply
+	
+	let mut result: Vec<bool> = Vec::new();
+
+	// Iterate over every cell
+	for i in 0..current_state.len() {
+		if i == 0 {
+			// First cell, loop back
+			result.push(rule(current_state[current_state.len() - 1], current_state[i], current_state[i+1]));
+		}else if i == current_state.len() - 1 {
+			// Last cell, loop forward
+			result.push(rule(current_state[i-1], current_state[i], current_state[0]));
+		}else {
+			result.push(rule(current_state[i-1], current_state[i], current_state[i+1]));
+		}
+    }
+
+	return result;
 }
